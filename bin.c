@@ -27,7 +27,7 @@ int main(){
       if(p[1]==maj)buf2[j]--; else if(p[1]==min) buf2[j]++; else puts(p);
     }
     int sum=0;for(j=0;j<6210;j++)sum+=buf2[j];
-    //if(sum<=6210*2*0.9&&sum>=-6210*2*0.9){
+    if(sum<=6210*2*0.9&&sum>=-6210*2*0.9){
       count++;
       fprintf(out,"%d\t",pos);
       for(j=0;j<6209;j++){
@@ -37,7 +37,7 @@ int main(){
       if(buf2[j]==2)fputs("2\n",out);
       else if(buf2[j]==0)fputs("1\n",out);
       else fputs("0\n",out);
-    //}
+    }
   }
   printf("%d\n",count);
   return 0;
