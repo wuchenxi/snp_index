@@ -11,7 +11,7 @@ n_s = 4754
 y = SP.array(list(csv.reader(open('pheno','rb'),
                              delimiter='\t'))).astype(float)
 y = y[:4754,:]
-y = y[:,2].reshape((n_s,1))
+y = y[:,2].reshape((n_s,1))#feature 3
 
 
 # load genotypes
@@ -57,18 +57,35 @@ test=test1+test2
 yhat=SP.zeros((n_s,1))
 yhat[train]=y[train]
 
-reg=LM.BayesianRidge(n_iter=20)
-reg.fit(X[train],yhat[train][:,0])
-res=reg.predict(X[test1])
-yhat[test1]=res.reshape((res.shape[0],1))
+def train_and_eval_with_select(Xtrain,Xtest,ytrain):
+    ytrain=ytrain.ravel()
+    from sklearn.feature_selection import f_regression
+    F, p=f_regression(Xtrain,ytrain)
+    features=[]
+    for i in xrange(Xtrain.shape[1]):
+        if p[i]<0.001:
+            features+=[i]
+    print len(features)
+    Xtrain=Xtrain[:,features]
+    Xtest=Xtest[:,features]
+    reg=LM.BayesianRidge(n_iter=30)
+    reg.fit(Xtrain, ytrain)
+    res=reg.predict(Xtest)
+    return res.reshape((res.shape[0],1))
 
-reg=LM.BayesianRidge(n_iter=20)
-reg.fit(X[train2],yhat[train2][:,0])
-res=reg.predict(X[test2])
-yhat[test2]=res.reshape((res.shape[0],1))
+def train_and_eval(Xtrain,Xtest,ytrain):
+    ytrain=ytrain.ravel()
+    reg=LM.BayesianRidge(n_iter=30)
+    reg.fit(Xtrain, ytrain)
+    res=reg.predict(Xtest)
+    return res.reshape((res.shape[0],1))
 
 
-print yhat[test]
+yhat[test1]=train_and_eval_with_select(X[train], X[test1], yhat[train])
+yhat[test2]=train_and_eval_with_select(X[train2], X[test2], yhat[train2])
+
+
+print yhat[test].ravel()
 corr = 1./len(test) * SP.dot((yhat[test]-yhat[test].mean()).T,y[test]
                              -y[test].mean())/(yhat[test].std()*y[test].std())
 print corr[0,0]
