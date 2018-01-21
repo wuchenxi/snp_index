@@ -16,7 +16,7 @@ y = y[:,2].reshape((n_s,1))#feature 3
 # load genotypes
 X = SP.array(list(csv.reader(open('geno','rb'),delimiter='\t'))).astype(float)
 
-# remove snp label
+# normalize snp index
 X = X[:,:n_s]
 n_f = X.shape[0]
 for i in xrange(n_f):
@@ -39,7 +39,6 @@ idxmc=[]
 idxfc=[]
 for i in xrange(split_idx.shape[0]):
     if split_idx[i,0]==2:
-        print i, parents[i,1]
         if parents[i,1] not in idxfc:
             idxfc=idxfc+[parents[i,1]]
         if parents[i,0] not in idxmc:
