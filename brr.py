@@ -57,9 +57,26 @@ test=test1+test2
 yhat=SP.zeros((n_s,1))
 yhat[train]=y[train]
 
+def train_and_eval_with_select(Xtrain,Xtest,ytrain):
+    ytrain=ytrain.ravel()
+    from sklearn.feature_selection import f_regression
+    F, p=f_regression(Xtrain,ytrain)
+    features=[]
+    for i in xrange(Xtrain.shape[1]):
+        if p[i]<0.001:
+            print p[i]
+            features+=[i]
+    print len(features)
+    Xtrain=Xtrain[:,features]
+    Xtest=Xtest[:,features]
+    reg=LM.BayesianRidge(n_iter=30)
+    reg.fit(Xtrain, ytrain)
+    res=reg.predict(Xtest)
+    return res.reshape((res.shape[0],1))
+
 def train_and_eval(Xtrain,Xtest,ytrain):
     ytrain=ytrain.ravel()
-    reg=LM.Lars(n_nonzero_coefs=4500)
+    reg=LM.BayesianRidge(n_iter=100)
     reg.fit(Xtrain, ytrain)
     res=reg.predict(Xtest)
     return res.reshape((res.shape[0],1))
