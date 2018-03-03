@@ -49,5 +49,8 @@ for snp in snp_f:
         for c in cursum[:-1]:
             print(c,end=' ')
         print(cursum[-1])
-        curint=int_end(next(interval_f))
+        while True:
+            curint=int_end(next(interval_f))
+            if snp_name<curint:
+                break
         cursum=[snp_weight*y for y in snp_val]
