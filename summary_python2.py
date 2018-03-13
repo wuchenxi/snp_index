@@ -1,5 +1,5 @@
 #Usage: python summary.py > output_file_name
-#For example: python3 summary.py > out
+#For example: python summary.py > out
 #Input files: emaize_5M.add.gz merbin_infw.txt snpfunc_5M_emaize.gz 200kpos.txt
 #Then "out" is a space separated snp-index file and we can use various ML methods to analyze it.
 
