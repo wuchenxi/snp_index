@@ -1,3 +1,10 @@
+#usage: Put the following input files at the same folder as this file:
+# geno: space separated snp-index file
+# pheno: 3 columns of phenotype, tab separated
+# parents.txt: 2 columns of parental index
+# Then do python brr.py
+# Printout will be the predicted phenotype for samples 4755-6210 from the phenotype of the first 4754 samples
+
 import csv
 import scipy as SP
 import scipy.linalg as LA
@@ -7,18 +14,15 @@ import sklearn.linear_model as LM
 
 ## Main program
 
-n_s = 4754
+n_s = 6210
 y = SP.array(list(csv.reader(open('pheno','rb'),
                              delimiter='\t'))).astype(float)
-y = y[:4754,:]
 y = y[:,2].reshape((n_s,1))#feature 3
 
 
-# load genotypes
-X = SP.array(list(csv.reader(open('geno','rb'),delimiter='\t'))).astype(float)
+# load genotype
+X = SP.array(list(csv.reader(open('geno','rb'),delimiter=' '))).astype(float)
 
-# remove snp label
-X = X[:,:n_s]
 n_f = X.shape[0]
 for i in xrange(n_f):
     sd=(X[i]).std()
@@ -32,25 +36,18 @@ print X.shape
 
 parents = SP.array(list(csv.reader(open('parents.txt','rb'),
                                    delimiter='\t'))).astype(int)
-parents=parents[:4754,:]
-idxm=range(1,191)
-SP.random.shuffle(idxm)
-idxm=idxm[:5]
-idxf=range(1, 26)
-SP.random.shuffle(idxf)
-idxf=idxf[:5]
 
-train=[]
+idxf=[]
+train=list(range(4754))
+for i in train:
+    idxf=parents[i,m]
 test1=[]
 test2=[]
 for i in xrange(n_s):
     if parents[i,1] in idxf:
         test2=test2+[i]
     else:
-        if parents[i,0] in idxm:
-            test1=test1+[i]
-        else:
-            train=train+[i]
+        test1=test1+[i]
 train2=train+test1
 test=test1+test2
 
@@ -86,7 +83,8 @@ yhat[test1]=train_and_eval(X[train], X[test1], yhat[train])
 yhat[test2]=train_and_eval(X[train2], X[test2], yhat[train2])
 
 
-print yhat[test].ravel()
-corr = 1./len(test) * SP.dot((yhat[test]-yhat[test].mean()).T,y[test]
-                             -y[test].mean())/(yhat[test].std()*y[test].std())
-print corr[0,0]
+for i in range(len(test)):
+    print test[i], yhat[test[i]]
+#corr = 1./len(test) * SP.dot((yhat[test]-yhat[test].mean()).T,y[test]
+#                             -y[test].mean())/(yhat[test].std()*y[test].std())
+#print corr[0,0]
