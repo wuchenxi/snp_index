@@ -43,7 +43,7 @@ for snp in snp_f:
     while snp_name>curex:
         exclude_s=exclude_f.readline()
         if exclude_s==b'':
-            curex=(11,0)
+            curex=(11,1)
         else:
             curex=ind_exclude(exclude_s)
     snp_val=[int(x) for x in snp_l[3:]]
@@ -52,7 +52,7 @@ for snp in snp_f:
     while split_name(func_l[0])<snp_name:
         func_s=func_f.readline()
         if func_s==b'':
-            sys.exit(0)
+            func_l=["chr11.s_1",0,1]
         else:
             func_l=(func_s).decode("ascii").split(",")
     if split_name(func_l[0])==snp_name:
