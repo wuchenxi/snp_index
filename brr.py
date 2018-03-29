@@ -40,7 +40,6 @@ parents = SP.array(list(csv.reader(open(sys.argv[3],'rb'),
 split_idx=list(csv.reader(open(sys.argv[4],'rb'),delimiter='\t'))
 train=[x for x in range(6210) if split_idx[x]=="2"]
         
-list(range(4754))
 
 idxf=[]
 for i in train:
