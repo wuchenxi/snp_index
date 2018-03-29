@@ -1,7 +1,7 @@
-//Input files: emaize_5M.add.gz merbin_infw.txt snpfunc_5M_emaize 200kpos.txt
+//Input files: emaize_5M.add.gz merbin_infw.txt snpfunc_5M_emaize 200kpos.txt wlst
 //Usage: Put input files and summary.cpp at the same directory, then:
 //             g++ -O3 summary.cpp -o summary
-//             gzip -dc emaize_5M.add.gz | ./summary merbin_infw.txt snpfunc_5M_emaize 200kpos.txt 1 1 1 1 1 1 > out
+//             gzip -dc emaize_5M.add.gz | ./summary merbin_infw.txt snpfunc_5M_emaize 200kpos.txt wlst > out
 //Then "out" is a space separated snp-index file and we can use various ML methods to analyze it.
 
 #include<cstdio>
@@ -67,8 +67,9 @@ int main(int argc, char* argv[]){
   char* intervals_file_name=argv[1];
   char* comments_file_name=argv[2];
   char* exclude_file_name=argv[3];
+  FILE* weight_file=fopen(argv[4],"r");
   for(int i=0;i<6;i++)
-    sscanf(argv[4+i],"%lf",weights+i);
+    fscanf(weight_file,"%lf",weights+i);
   
   fgets(buf1,102400,stdin);
   FILE* interval_f=fopen(intervals_file_name,"r");
