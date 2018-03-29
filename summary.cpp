@@ -121,7 +121,7 @@ int main(int argc, char* argv[]){
     else{
       for(int i=0;i<6210-1;i++)printf("%g ",cursum[i]);
       printf("%g\n",cursum[6209]);
-      while(compare(curint,snp_name)<=0){
+      while(compare(curint,snp_name)<=0 && !feof(interval_f)){
 	fgets(buf2,102400,interval_f);
 	curint=int_end(buf2);
       }
