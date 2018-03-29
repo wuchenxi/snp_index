@@ -2,8 +2,8 @@
 # geno: space separated snp-index file
 # pheno: 3 columns of phenotype, tab separated
 # parents.txt: 2 columns of parental index
-# Then do python brr.py
-# Printout will be the predicted phenotype for samples 4755-6210 from the phenotype of the first 4754 samples
+# Then do python brr.py geno pheno parents.txt sample_idx 2
+# Printout will be the predicted phenotype
 
 import csv
 import scipy as SP
@@ -11,17 +11,17 @@ import scipy.linalg as LA
 import scipy.stats as ST
 import scipy.optimize as OPT
 import sklearn.linear_model as LM
-
+import sys
 ## Main program
 
 n_s = 6210
-y = SP.array(list(csv.reader(open('pheno','rb'),
+y = SP.array(list(csv.reader(open(sys.argv[2],'rb'),
                              delimiter='\t'))).astype(float)
-y = y[:,2].reshape((n_s,1))#feature 3
+y = y[:,int(sys.argv[5])].reshape((n_s,1))#feature 3
 
 
 # load genotype
-X = SP.array(list(csv.reader(open('geno','rb'),delimiter=' '))).astype(float)
+X = SP.array(list(csv.reader(open(sys.argv[1],'rb'),delimiter=' '))).astype(float)
 
 n_f = X.shape[0]
 for i in xrange(n_f):
@@ -34,19 +34,23 @@ X = X.T
 print X
 print X.shape
 
-parents = SP.array(list(csv.reader(open('parents.txt','rb'),
+parents = SP.array(list(csv.reader(open(sys.argv[3],'rb'),
                                    delimiter='\t'))).astype(int)
 
+split_idx=list(csv.reader(open(sys.argv[4],'rb'),delimiter='\t'))
+train=[x for x in range(6210) if split_idx[x]=="2"]
+        
+list(range(4754))
+
 idxf=[]
-train=list(range(4754))
 for i in train:
-    idxf=parents[i,m]
+    idxf=[parents[i,1]]
 test1=[]
 test2=[]
 for i in xrange(n_s):
-    if parents[i,1] in idxf:
+    if parents[i,1] not in idxf:
         test2=test2+[i]
-    else:
+    elif i not in train:
         test1=test1+[i]
 train2=train+test1
 test=test1+test2
@@ -85,6 +89,3 @@ yhat[test2]=train_and_eval(X[train2], X[test2], yhat[train2])
 
 for i in range(len(test)):
     print test[i], yhat[test[i]]
-#corr = 1./len(test) * SP.dot((yhat[test]-yhat[test].mean()).T,y[test]
-#                             -y[test].mean())/(yhat[test].std()*y[test].std())
-#print corr[0,0]
