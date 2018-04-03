@@ -38,12 +38,12 @@ parents = SP.array(list(csv.reader(open(sys.argv[3],'rb'),
                                    delimiter='\t'))).astype(int)
 
 split_idx=list(csv.reader(open(sys.argv[4],'rb'),delimiter='\t'))
-train=[x for x in range(6210) if split_idx[x]=="2"]
+train=[x for x in range(6210) if split_idx[x]==["2"]]
         
 
 idxf=[]
 for i in train:
-    idxf=[parents[i,1]]
+    idxf=idxf+[parents[i,1]]
 test1=[]
 test2=[]
 for i in xrange(n_s):
