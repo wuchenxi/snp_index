@@ -1,5 +1,5 @@
 #usage: Put the following input files at the same folder as this file:
-# geno: space separated snp-index file
+# geno: space separated snp-index file, first column is number of snp in each interval.
 # pheno: 3 columns of phenotype, tab separated
 # parents.txt: 2 columns of parental index
 # Then do python brr.py geno pheno parents.txt sample_idx 2
@@ -24,13 +24,10 @@ y = y[:,int(sys.argv[5])].reshape((n_s,1))#feature 3
 X = SP.array(list(csv.reader(open(sys.argv[1],'rb'),delimiter=' '))).astype(float)
 
 n_f = X.shape[0]
+X1=X[:,1:]
 for i in xrange(n_f):
-    sd=(X[i]).std()
-    if sd == 0:
-        X[i]=X[i]-(X[i]).mean()
-    else:
-        X[i]=(X[i]-(X[i]).mean())/sd
-X = X.T
+    X1[i]=(X1[i]-(X1[1]).mean())/X[i,0]
+X = X1.T
 print X
 print X.shape
 
