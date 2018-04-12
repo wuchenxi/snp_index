@@ -1,77 +1,58 @@
+#usage: Put the following input files at the same folder as this file:
+# geno: space separated snp-index file, first column is number of snp in each interval.
+# pheno: 3 columns of phenotype, tab separated
+# parents.txt: 2 columns of parental index
+# Then do python brr.py geno pheno parents.txt sample_idx 2
+# Printout will be the predicted phenotype
+
 import csv
 import scipy as SP
 import scipy.linalg as LA
 import scipy.stats as ST
 import xgboost as xgb
-
+import sys
 ## Main program
 
-n_s = 4754
-y = SP.array(list(csv.reader(open('pheno','rb'),
+n_s = 6210
+y = SP.array(list(csv.reader(open(sys.argv[2],'rb'),
                              delimiter='\t'))).astype(float)
-y = y[:4754,:]
-y = y[:,2].reshape((n_s,1))#feature 3
+y = y[:,int(sys.argv[5])].reshape((n_s,1))#feature 3
 
 
-# load genotypes
-X = SP.array(list(csv.reader(open('geno','rb'),delimiter='\t'))).astype(float)
+# load genotype
+X = SP.array(list(csv.reader(open(sys.argv[1],'rb'),delimiter=' '))).astype(float)
 
-# normalize snp index
-X = X[:,:n_s]
 n_f = X.shape[0]
+X1=X[:,1:]
 for i in xrange(n_f):
-    sd=(X[i]).std()
-    if sd == 0:
-        X[i]=X[i]-(X[i]).mean()
-    else:
-        X[i]=(X[i]-(X[i]).mean())/sd
-X = X.T
+    X1[i]=(X1[i]-(X1[1]).mean())/X[i,0]
+X = X1.T
 print X
 print X.shape
 
-parents = SP.array(list(csv.reader(open('parents.txt','rb'),
+parents = SP.array(list(csv.reader(open(sys.argv[3],'rb'),
                                    delimiter='\t'))).astype(int)
 
-#use sample_idx
-split_idx=SP.array(list(csv.reader(open('sample_idx','rb'),
-                                   delimiter='\t'))).astype(int)
-idxmc=[]
-idxfc=[]
-for i in xrange(split_idx.shape[0]):
-    if split_idx[i,0]==2:
-        if parents[i,1] not in idxfc:
-            idxfc=idxfc+[parents[i,1]]
-        if parents[i,0] not in idxmc:
-            idxmc=idxmc+[parents[i,0]]
-idxm=[x for x in range(1,191) if x not in idxmc]
-idxf=[x for x in range(1,26) if x not in idxfc]
-print idxm, idxf
+split_idx=list(csv.reader(open(sys.argv[4],'rb'),delimiter='\t'))
+train=[x for x in range(6210) if split_idx[x]==["2"]]
+        
 
-#random index
-##parents=parents[:4754,:]
-##idxm=range(1,191)
-##SP.random.shuffle(idxm)
-##idxm=idxm[:5]
-##idxf=range(1, 26)
-##SP.random.shuffle(idxf)
-##idxf=idxf[:5]
-
-train=[]
+idxf=[]
+for i in train:
+    idxf=idxf+[parents[i,1]]
 test1=[]
 test2=[]
 for i in xrange(n_s):
-    if parents[i,1] in idxf:
+    if parents[i,1] not in idxf:
         test2=test2+[i]
-    else:
-        if parents[i,0] in idxm:
-            test1=test1+[i]
-        else:
-            train=train+[i]
+    elif i not in train:
+        test1=test1+[i]
 train2=train+test1
 test=test1+test2
 
 yhat=SP.zeros((n_s,1))
 yhat[train]=y[train]
+
 
 def train_and_eval(Xtrain,Xtest,ytrain):
     ns=Xtrain.shape[0]
@@ -84,17 +65,14 @@ def train_and_eval(Xtrain,Xtest,ytrain):
     param = {'eta':0.05,'silent':1,
             'subsample':0.5,
            'lambda':0.8}
-    model=xgb.train(param, xg_train, 300, [(xg_valid, 'valid')],
+    model=xgb.train(param, xg_train, 500, [(xg_valid, 'valid')],
                     early_stopping_rounds=30, verbose_eval=10)
     res=model.predict(xgb.DMatrix(Xtest), ntree_limit=model.best_ntree_limit)
     return res.reshape((res.shape[0],1))
-
 
 yhat[test1]=train_and_eval(X[train], X[test1], yhat[train])
 yhat[test2]=train_and_eval(X[train2], X[test2], yhat[train2])
 
 
-print yhat[test].ravel()
-corr = 1./len(test) * SP.dot((yhat[test]-yhat[test].mean()).T,y[test]
-                             -y[test].mean())/(yhat[test].std()*y[test].std())
-print corr[0,0]
+for i in range(len(test)):
+    print test[i], yhat[test[i]]
