@@ -84,5 +84,5 @@ def train_and_eval(Xtrain,Xtest,ytrain):
 yhat[test1]=train_and_eval(X[train], X[test1], yhat[train])
 yhat[test2]=train_and_eval(X[train2], X[test2], yhat[train2])
 
-summ=[(y[test[i]]-yhat[test[i]])**2 for i in range(len(test)) if i in valid]
+summ=[(y[test[i]]-yhat[test[i]])**2 for i in range(len(test)) if test[i] in valid]
 print sum(summ)
