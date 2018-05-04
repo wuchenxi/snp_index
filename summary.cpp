@@ -113,6 +113,7 @@ int main(int argc, char* argv[]){
   fgets(buf4,102400,exclude_f);
   sid curex=exclude(buf4);
   int snpcount=0;
+  double sumweight=0;
   while(!feof(stdin)){
     fgets(buf1,102400,stdin);
     if(strlen(buf1)<2)break;
@@ -144,10 +145,11 @@ int main(int argc, char* argv[]){
       continue;
     if(compare(snp_name, curint)<0){
       snpcount++;
+      sumweight+=snp_weight;
       for(int i=0;i<6210;i++)
 	cursum[i]+=snp_weight*snp_l[i];
     }
-    else{if(snpcount){
+    else{if(snpcount && sumweight){
 	printf("%d ",snpcount);
       for(int i=0;i<6210-1;i++)printf("%g ",cursum[i]);
       printf("%g\n",cursum[6209]);}
@@ -161,6 +163,7 @@ int main(int argc, char* argv[]){
 	for(int i=0;i<6210;i++)
 	  cursum[i]=snp_weight*snp_l[i];
 	snpcount=1;
+	sumweight=snp_weight;
       }
       else
 	break;
