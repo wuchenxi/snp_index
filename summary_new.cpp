@@ -1,4 +1,4 @@
-//Input files: emaize_5M.add.gz merbin_infw.txt snpfunc_5M_emaize 200kpos.txt wlst
+//Input files: emaize_5M.add.gz merbin_infw.txt snpfunc_5M_emaize chr_name
 //Usage: Put input files and summary.cpp at the same directory, then:
 //             g++ -O3 summary_new.cpp -o summary
 //             gzip -dc chr1_Ncii4M.num.gz | ./summary merbin_infw.txt chr1_anno.txt 1 > out
