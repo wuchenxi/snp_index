@@ -1,4 +1,4 @@
-//Input files: emaize_5M.add.gz merbin_infw.txt snpfunc_5M_emaize chr_name
+//Input files: emaize_5M.add.gz merbin_infw.txt snpfunc_5M_emaize 
 //Usage: Put input files and summary.cpp at the same directory, then:
 //             g++ -O3 summary_new.cpp -o summary
 //             gzip -dc chr1_Ncii4M.num.gz | ./summary merbin_infw.txt chr1_anno.txt 1 > out
@@ -49,6 +49,7 @@ int func(char* s,double* r){
   for(int i=0;i<19;i++)
     if(strcmp(f,annos[i])==0)
       return i;
+  return -1;
 }
 
 
@@ -84,7 +85,7 @@ int main(int argc, char* argv[]){
       fgets(buf3,102400,func_f);
       if(strlen(buf3)>2)
 	cat=func(buf3, &cur_func);
-      else break;
+      else return 0;
     }
   
     if(cur_func==snp_name && cat<19 && cat>=0)
