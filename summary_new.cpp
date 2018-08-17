@@ -11,7 +11,7 @@
 #include<cstdlib>
 #include<cstring>
 
-const char* annos[]={"anno", "downstream_gene_variant", "3_prime_UTR_variant", "intron_variant", "missense_variant", "5_prime_UTR_variant", "synonymous_variant", "upstream_gene_variant", "splice_region_variant", "intergenic_variant", "splice_donor_variant", "stop_gained", "stop_lost", "start_lost", "splice_acceptor_variant", "stop_retained_variant", "non_coding_transcript_exon_variant", "coding_sequence_variant", "incomplete_terminal_codon_variant"};
+const char* annos[]={"missense_variant","start_lost","stop_lost","stop_gained","incomplete_terminal_codon_variant","stop_retained_variant","coding_sequence_variant","synonymous_variant","non_coding_transcript_exon_variant","5_prime_UTR_variant", "3_prime_UTR_variant","splice_region_variant", "splice_donor_variant", "splice_acceptor_variant", "intron_variant","upstream_gene_variant", "downstream_gene_variant","intergenic_variant","anno"};
 
 char buf1[1024000];
 char buf2[102400];
@@ -49,7 +49,7 @@ int func(char* s,double* r){
   for(int i=0;i<19;i++)
     if(strcmp(f,annos[i])==0)
       return i;
-  return -1;
+  return 0;
 }
 
 
@@ -70,56 +70,70 @@ int main(int argc, char* argv[]){
   int cat=func(buf3, &cur_func);
   for(int i0=0;i0<19;i0++){for(int i=0;i<6211;i++)cursum[i0][i]=0;}
   double sumweight=0;
-  while(!feof(stdin)){
+  int terminating=0;
+  while(!feof(stdin)){      
     fgets(buf1,102400,stdin);
-    if(strlen(buf1)<2)break;
+    if(strlen(buf1)<16)break;
     char* snp_c=strtok(buf1,"\t");
     //printf("%s\n",snp_c);
+      double snp_name=split_name(snp_c);
+      if(snp_name<0)break;
     for(int i=0;i<6210;i++)
       snp_l[i]=(int)(strtok(NULL,"\t")[0]-'0');
-    double snp_name=split_name(snp_c);
-    if(snp_name<0){continue;}
-    //printf("%g\n",snp_name);
-    
-    while(cur_func<snp_name && !feof(func_f)){
+    //printf("%lf\n",snp_name);
+    cat=19;
+    while(cur_func<=snp_name && !feof(func_f)){
       fgets(buf3,102400,func_f);
-      if(strlen(buf3)>2)
-	cat=func(buf3, &cur_func);
-      else return 0;
+      if(strlen(buf3)>2){
+	int tcat=func(buf3, &cur_func);
+	if(tcat<cat)cat=tcat;
+      }
+     else {
+	terminating=1;
+	break;
+      }
     }
   
-    if(cur_func==snp_name && cat<19 && cat>=0)
-      ;
-    else
-      continue;
-    if(snp_name<curint){
-      sumweight+=1;
-      cursum[cat][0]+=1;
-      for(int i=0;i<6210;i++)
-	cursum[cat][i+1]+=snp_l[i];
-    }
-     else{
-       if(sumweight){
-	for(int i0=0;i0<19;i0++){
-	  for(int i=0;i<6210;i++)
-	    printf("%g ",cursum[i0][i]);
-          printf("%g\n",cursum[i0][6210]);}
+    if(cat<19 && cat>=0){
+      if(snp_name<=curint){
+	 sumweight+=1;
+	 cursum[cat][0]+=1;
+	 for(int i=0;i<6210;i++)
+	   cursum[cat][i+1]+=snp_l[i];
       }
-      while(curint<=snp_name && !feof(interval_f)){
-	fgets(buf2,102400,interval_f);
-	if(strlen(buf2)>2)curint=int_end(buf2);
-	else return 0;
-	if(curint==-2)return 0;
-      }
-      if(snp_name<curint){
-	cursum[cat][0]++;
-	for(int i=0;i<6210;i++)
-	  cursum[cat][i+1]=snp_l[i];
-	sumweight++;
-      }
-      else
-	break;
+      else{
+	if(sumweight){
+	  for(int i0=0;i0<19;i0++){
+	    for(int i=0;i<6210;i++)
+	      printf("%g ",cursum[i0][i]);
+	    printf("%g\n",cursum[i0][6210]);
+	  }
 	}
-    }  
+	while(curint<snp_name && !feof(interval_f)){
+	  fgets(buf2,102400,interval_f);
+	  curint=-2;
+	  if(strlen(buf2)>2)curint=int_end(buf2);
+	  else break;
+	}
+	if(curint==-2)
+	  return 0;
+	else if(snp_name<curint){
+	  cursum[cat][0]++;
+	  for(int i=0;i<6210;i++)
+	    cursum[cat][i+1]=snp_l[i];
+	  sumweight++;
+	}
+      }
+    }
+    if(terminating)
+      break;
+  }
+  if(sumweight){
+    for(int i0=0;i0<19;i0++){
+      for(int i=0;i<6210;i++)
+	printf("%g ",cursum[i0][i]);
+      printf("%g\n",cursum[i0][6210]);
+    }
+  }
   return 0;
 }
