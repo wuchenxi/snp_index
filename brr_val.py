@@ -63,7 +63,7 @@ def train_and_eval_with_select(Xtrain,Xtest,ytrain):
     features=[]
     for i in range(Xtrain.shape[1]):
         if p[i]<0.001:
-            print p[i]
+            print(p[i])
             features+=[i]
     print(len(features))
     Xtrain=Xtrain[:,features]
