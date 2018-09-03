@@ -1,4 +1,4 @@
-#Usage: cat Sum_Chrs | python3 corr.py pheno_6210 sample_idx_va1 2 > Sum
+#Usage: cat Sum_Chrs | python corr.py pheno_6210 sample_idx_va1 2 > Sum
 #Here 2 means the third phenotype
 #pheno.csv is tab separated, with unknowns as "nan" or "NA"
 
@@ -17,7 +17,7 @@ for l in po:
     if elm[0]=='N':
         pheno+=[float("nan")]
     else:
-        pheno+=[float(l.split(",")[npheno])]
+        pheno+=[float(elm)]
 y=[pheno[i] for i in range(6210) if index[i]>0]
     
 count=0
