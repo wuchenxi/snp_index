@@ -1,6 +1,6 @@
-#Usage: gzip -dc sum_chr1.gz | python3 corr.py pheno.csv index 2 | gzip > chr1.gz
+#Usage: cat Sum_Chrs | python3 corr.py pheno_6210 sample_idx_va1 2 > Sum
 #Here 2 means the third phenotype
-#pheno.csv is comma separated, with unknowns as "nan"
+#pheno.csv is tab separated, with unknowns as "nan" or "NA"
 
 import fileinput
 import sys
@@ -13,12 +13,16 @@ po=open(sys.argv[1],"r").readlines()
 npheno=int(sys.argv[3])
 pheno=[]
 for l in po:
-    pheno+=[float(l.split(",")[npheno])]
+    elm=l.split("\t")[npheno]
+    if elm[0]=='N':
+        pheno+=[float("nan")]
+    else:
+        pheno+=[float(l.split(",")[npheno])]
 y=[pheno[i] for i in range(6210) if index[i]>0]
     
 count=0
 sum=[0.0]*6011
-for line in sys.stdin.readlines():
+for line in sys.stdin:
     count+=1
     if count==19:
         count=0
