@@ -18,8 +18,7 @@ for line in sys.stdin:
         sum=[0.0]*6211
         continue
     lst=[float(x) for x in line.split(" ")]
-    if coef==coef:
-        sum=[x+weights[count]*y for x, y in zip(sum, lst)]
+    sum=[x+weights[count]*y for x, y in zip(sum, lst)]
     
     
     
