@@ -1,4 +1,4 @@
-#Usage: cat Sum_Chrs | python3 corr.py > Sum
+#Usage: cat Sum_Chrs | python corr.py > Sum
 #Here 2 means the third phenotype
 #pheno.csv is tab separated, with unknowns as "nan" or "NA"
 
